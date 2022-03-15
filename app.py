@@ -244,6 +244,8 @@ def account(id):
                 translation = req.json()['translation']
                 # msgs[i].append(translation[0])
 
+                print(f'https://translator.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
+
                 msgs[1] = translation[0]  # TODO: Поменять на запрос
             now = datetime.utcnow()
             new_msg = Messages(id_sender=int(current_user.id), id_chat=int(id), message_en=msgs[0], message_ru=msgs[1],
