@@ -1,5 +1,5 @@
 import requests as requests
-from flask import Flask, render_template, url_for, redirect, request, flash
+from flask import Flask, render_template, url_for, redirect, request, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from flask_login import UserMixin
@@ -7,11 +7,14 @@ from flask_login import LoginManager
 from flask_login import login_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'thisIsASecretKey'
 db = SQLAlchemy(app)
+
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 login_manager = LoginManager()
 login_manager.login_view = 'login'
@@ -64,6 +67,79 @@ class Messages(db.Model):
 
     def __repr__(self):
         return '<Messages %r>' % self.id
+
+
+# 1
+@socketio.on('message')
+def handleMessage(data):
+    if data['room']:
+        join_room(data['room'])
+        chat_id = data['room'].split('/chat/')
+        print("Chat Id: ", chat_id)
+        if len(chat_id) >= 2 and data['username'] != 'Service message':
+            chat_id = int(chat_id[-1])
+            # Send to db
+
+            msg = data['msg']
+            msgs = [0] * 2
+            if current_user.lang == 1:
+                msgs[1] = msg
+
+                temp = msg.replace('?', '&quest')
+                req = requests.get(f'https://translator1.loca.lt/translate/{temp}?src_lang=ru&trg_lang=en')
+                translation = req.json()['translation']
+                # msgs[i].append(translation[0])
+
+                msgs[0] = translation[0]
+            else:
+                msgs[0] = msg
+
+                temp = msg.replace('?', '&quest')
+                req = requests.get(f'https://translator1.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
+                translation = req.json()['translation']
+                # msgs[i].append(translation[0])
+
+                print(f'https://translator1.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
+
+                msgs[1] = translation[0]
+            now = datetime.utcnow()
+            new_msg = Messages(id_sender=int(current_user.id), id_chat=chat_id, message_en=msgs[0], message_ru=msgs[1],
+                               date=now)
+
+            print('New message:', int(current_user.id), chat_id, msgs[0], msgs[1], now)
+
+            # add the new user to the database
+            db.session.add(new_msg)
+            db.session.commit()
+
+            msgs = [current_user.id, current_user.username,
+                       {'EN': msgs[0], 'RU': msgs[1]}, now.strftime("%b %d, %Y, %X"),
+                       'RU' if current_user.lang == 1 else 'EN']
+            if current_user.lang == 1:
+                temp = msgs[2]['RU'].replace('?', '&quest')
+                temp = temp.replace(' ', '%20')
+
+                msgs.append(f'https://translator1.loca.lt/synthesize/{temp}?src_lang=ru')
+            else:
+                temp = msgs[2]['EN'].replace('?', '&quest')
+                temp = temp.replace(' ', '%20')
+
+                msgs.append(f'https://translator1.loca.lt/synthesize/{temp}?src_lang=en')
+
+
+            data['msgs'] = msgs
+            print(f"Message: {data} CurrentUser: {current_user.id}, {current_user.username}")
+            send(data, room=data['room'])
+        else:
+            print(f"Message: {data} CurrentUser: {current_user.id}, {current_user.username}")
+            send(data, room=data['room'])
+    else:
+        print(f"Broadcasted Message: {data} CurrentUser: {current_user.id}, {current_user.username}")
+        send(data, broadcast=True)
+
+    # message = ChatMessages(username=data['username'], msg=data['msg'])
+    # db.session.add(message)
+    # db.session.commit()
 
 
 @app.route('/login')
@@ -133,11 +209,13 @@ def signup():
 @app.route('/')
 @app.route('/home')
 def index():
+    # print(session)
     if current_user.is_authenticated:
         chats = ChatToUser.query.filter_by(id_user=current_user.id).all()
         for i in range(len(chats)):
             chats[i] = Chat.query.filter_by(id=chats[i].id_chat).first()
-        return render_template("index.html", name=current_user.username, chats=chats)
+        return render_template("index.html",
+                               name=current_user.username + ' ' + ('EN' if current_user.lang == 0 else 'RU'), chats=chats)
         # return render_template("index.html", name=current_user.username)
     else:
         return render_template("index.html", name="Stranger")
@@ -175,38 +253,38 @@ def chat(id):
                        {'EN': msgs[i].message_en, 'RU': msgs[i].message_ru}, msgs[i].date.strftime("%b %d, %Y, %X"),
                        'RU' if User.query.filter_by(id=msgs[i].id_sender).first().lang == 1 else 'EN']
             ##if (current_user.lang == 1 and msgs[i][4] == 'RU') or (current_user.lang == 0 and msgs[i][4] == 'EN'):
-                ##msgs[i].append(msgs[i][2])
+            ##msgs[i].append(msgs[i][2])
             ##else:
-                # temp = msgs[i][2].replace('?', '&quest')
-                # req = requests.get(f'https://translator.loca.lt/translate/{temp}?src_lang={"ru" if msgs[i][4]=="RU" else "en"}&trg_lang={"ru" if current_user.lang==1 else "en"}')
-                # translation = req.json()['translation']
-                # msgs[i].append(translation[0])
+            # temp = msgs[i][2].replace('?', '&quest')
+            # req = requests.get(f'https://translator.loca.lt/translate/{temp}?src_lang={"ru" if msgs[i][4]=="RU" else "en"}&trg_lang={"ru" if current_user.lang==1 else "en"}')
+            # translation = req.json()['translation']
+            # msgs[i].append(translation[0])
 
-                ################msgs[i].append('Translated')
+            ################msgs[i].append('Translated')
 
-                # temp = msgs[i][2].replace('?', '&quest')
-                # msgs[i].append(f'https://translator.loca.lt/translate/{temp}?src_lang={"ru" if msgs[i][4]=="RU" else "en"}&trg_lang={"ru" if current_user.lang==1 else "en"}')
+            # temp = msgs[i][2].replace('?', '&quest')
+            # msgs[i].append(f'https://translator.loca.lt/translate/{temp}?src_lang={"ru" if msgs[i][4]=="RU" else "en"}&trg_lang={"ru" if current_user.lang==1 else "en"}')
             if current_user.lang == 1:
                 temp = msgs[i][2]['RU'].replace('?', '&quest')
                 temp = temp.replace(' ', '%20')
 
                 # ru
 
-                #msgs[i].append('https://translator.loca.lt/dummy_audio')
-                msgs[i].append(f'https://translator.loca.lt/synthesize/{temp}?src_lang=ru')
+                # msgs[i].append('https://translator.loca.lt/dummy_audio')
+                msgs[i].append(f'https://translator1.loca.lt/synthesize/{temp}?src_lang=ru')
             else:
                 temp = msgs[i][2]['EN'].replace('?', '&quest')
                 temp = temp.replace(' ', '%20')
 
                 # en
 
-                #msgs[i].append('https://translator.loca.lt/dummy_audio')
-                msgs[i].append(f'https://translator.loca.lt/synthesize/{temp}?src_lang=en')
+                # msgs[i].append('https://translator.loca.lt/dummy_audio')
+                msgs[i].append(f'https://translator1.loca.lt/synthesize/{temp}?src_lang=en')
 
             # print(msgs[i])
 
-        return render_template("chatPage.html", name=current_user.username, chats=chats, chatId=id, msgs=msgs,
-                               my_link="https://translator.loca.lt/dummy_audio")
+        return render_template("chatPage.html", name=current_user.username + ' ' + ('EN' if current_user.lang == 0 else 'RU'),
+                               chats=chats, chatId=id, msgs=msgs, my_link="https://translator1.loca.lt/dummy_audio")
     else:
         return redirect(url_for("index"))
 
@@ -231,7 +309,7 @@ def account(id):
                 msgs[1] = msg
 
                 temp = msg.replace('?', '&quest')
-                req = requests.get(f'https://translator.loca.lt/translate/{temp}?src_lang=ru&trg_lang=en')
+                req = requests.get(f'https://translator1.loca.lt/translate/{temp}?src_lang=ru&trg_lang=en')
                 translation = req.json()['translation']
                 # msgs[i].append(translation[0])
 
@@ -240,16 +318,18 @@ def account(id):
                 msgs[0] = msg
 
                 temp = msg.replace('?', '&quest')
-                req = requests.get(f'https://translator.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
+                req = requests.get(f'https://translator1.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
                 translation = req.json()['translation']
                 # msgs[i].append(translation[0])
 
-                print(f'https://translator.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
+                print(f'https://translator1.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
 
                 msgs[1] = translation[0]  # TODO: Поменять на запрос
             now = datetime.utcnow()
             new_msg = Messages(id_sender=int(current_user.id), id_chat=int(id), message_en=msgs[0], message_ru=msgs[1],
                                date=now)
+
+            print('New message:', int(current_user.id), int(id), msgs[0], msgs[1], now)
 
             # add the new user to the database
             db.session.add(new_msg)
@@ -336,4 +416,5 @@ def addToChat(chatId):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)
+    # app.run(debug=True)
