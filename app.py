@@ -131,8 +131,9 @@ def handleMessage(data):
             print(f"Message: {data} CurrentUser: {current_user.id}, {current_user.username}")
             send(data, room=data['room'])
         else:
-            print(f"Message: {data} CurrentUser: {current_user.id}, {current_user.username}")
-            send(data, room=data['room'])
+            if data['username'] != 'Service message':
+                print(f"Message: {data} CurrentUser: {current_user.id}, {current_user.username}")
+                send(data, room=data['room'])
     else:
         print(f"Broadcasted Message: {data} CurrentUser: {current_user.id}, {current_user.username}")
         send(data, broadcast=True)

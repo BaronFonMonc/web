@@ -10,10 +10,10 @@ const socket = io();
 const username = document.getElementById("name_of_person").innerHTML;
 //const username = current_user.id;
 
-/*
+
 socket.on('connect', () => {
     socket.send({'username': 'Service message', 'msg': 'User ' + username + ' has connected!', 'room': window.location.href});
-});*/
+});
 
 
 const BOT_MSGS = [
