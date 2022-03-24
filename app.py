@@ -86,7 +86,7 @@ def handleMessage(data):
                 msgs[1] = msg
 
                 temp = msg.replace('?', '&quest')
-                req = requests.get(f'https://translator.loca.lt/translate/{temp}?src_lang=ru&trg_lang=en')
+                req = requests.get(f'https://translator1.loca.lt/translate/{temp}?src_lang=ru&trg_lang=en')
                 translation = req.json()['translation']
                 # msgs[i].append(translation[0])
 
@@ -95,11 +95,11 @@ def handleMessage(data):
                 msgs[0] = msg
 
                 temp = msg.replace('?', '&quest')
-                req = requests.get(f'https://translator.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
+                req = requests.get(f'https://translator1.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
                 translation = req.json()['translation']
                 # msgs[i].append(translation[0])
 
-                print(f'https://translator.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
+                print(f'https://translator1.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
 
                 msgs[1] = translation[0]
             now = datetime.utcnow()
@@ -119,12 +119,12 @@ def handleMessage(data):
                 temp = msgs[2]['RU'].replace('?', '&quest')
                 temp = temp.replace(' ', '%20')
 
-                msgs.append(f'https://translator.loca.lt/synthesize/{temp}?src_lang=ru')
+                msgs.append(f'https://translator1.loca.lt/synthesize/{temp}?src_lang=ru')
             else:
                 temp = msgs[2]['EN'].replace('?', '&quest')
                 temp = temp.replace(' ', '%20')
 
-                msgs.append(f'https://translator.loca.lt/synthesize/{temp}?src_lang=en')
+                msgs.append(f'https://translator1.loca.lt/synthesize/{temp}?src_lang=en')
 
 
             data['msgs'] = msgs
@@ -257,35 +257,35 @@ def chat(id):
             ##msgs[i].append(msgs[i][2])
             ##else:
             # temp = msgs[i][2].replace('?', '&quest')
-            # req = requests.get(f'https://translator.loca.lt/translate/{temp}?src_lang={"ru" if msgs[i][4]=="RU" else "en"}&trg_lang={"ru" if current_user.lang==1 else "en"}')
+            # req = requests.get(f'https://translator1.loca.lt/translate/{temp}?src_lang={"ru" if msgs[i][4]=="RU" else "en"}&trg_lang={"ru" if current_user.lang==1 else "en"}')
             # translation = req.json()['translation']
             # msgs[i].append(translation[0])
 
             ################msgs[i].append('Translated')
 
             # temp = msgs[i][2].replace('?', '&quest')
-            # msgs[i].append(f'https://translator.loca.lt/translate/{temp}?src_lang={"ru" if msgs[i][4]=="RU" else "en"}&trg_lang={"ru" if current_user.lang==1 else "en"}')
+            # msgs[i].append(f'https://translator1.loca.lt/translate/{temp}?src_lang={"ru" if msgs[i][4]=="RU" else "en"}&trg_lang={"ru" if current_user.lang==1 else "en"}')
             if current_user.lang == 1:
                 temp = msgs[i][2]['RU'].replace('?', '&quest')
                 temp = temp.replace(' ', '%20')
 
                 # ru
 
-                # msgs[i].append('https://translator.loca.lt/dummy_audio')
-                msgs[i].append(f'https://translator.loca.lt/synthesize/{temp}?src_lang=ru')
+                # msgs[i].append('https://translator1.loca.lt/dummy_audio')
+                msgs[i].append(f'https://translator1.loca.lt/synthesize/{temp}?src_lang=ru')
             else:
                 temp = msgs[i][2]['EN'].replace('?', '&quest')
                 temp = temp.replace(' ', '%20')
 
                 # en
 
-                # msgs[i].append('https://translator.loca.lt/dummy_audio')
-                msgs[i].append(f'https://translator.loca.lt/synthesize/{temp}?src_lang=en')
+                # msgs[i].append('https://translator1.loca.lt/dummy_audio')
+                msgs[i].append(f'https://translator1.loca.lt/synthesize/{temp}?src_lang=en')
 
             # print(msgs[i])
 
         return render_template("chatPage.html", name=current_user.username + ' ' + ('EN' if current_user.lang == 0 else 'RU'),
-                               chats=chats, chatId=id, msgs=msgs, my_link="https://translator.loca.lt/dummy_audio")
+                               chats=chats, chatId=id, msgs=msgs, my_link="https://translator1.loca.lt/dummy_audio")
     else:
         return redirect(url_for("index"))
 
@@ -310,7 +310,7 @@ def account(id):
                 msgs[1] = msg
 
                 temp = msg.replace('?', '&quest')
-                req = requests.get(f'https://translator.loca.lt/translate/{temp}?src_lang=ru&trg_lang=en')
+                req = requests.get(f'https://translator1.loca.lt/translate/{temp}?src_lang=ru&trg_lang=en')
                 translation = req.json()['translation']
                 # msgs[i].append(translation[0])
 
@@ -319,11 +319,11 @@ def account(id):
                 msgs[0] = msg
 
                 temp = msg.replace('?', '&quest')
-                req = requests.get(f'https://translator.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
+                req = requests.get(f'https://translator1.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
                 translation = req.json()['translation']
                 # msgs[i].append(translation[0])
 
-                print(f'https://translator.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
+                print(f'https://translator1.loca.lt/translate/{temp}?src_lang=en&trg_lang=ru')
 
                 msgs[1] = translation[0]  # TODO: Поменять на запрос
             now = datetime.utcnow()
