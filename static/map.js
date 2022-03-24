@@ -98,13 +98,13 @@ function appendMessageFull(ms, side) {
                 temp = ms[2]['RU'].replace('?', '&quest');
                 temp = temp.replace(' ', '%20');
 
-                ms[5]='https://translator1.loca.lt/synthesize/'+temp+'?src_lang=ru';
+                ms[5]='https://translator2.loca.lt/synthesize/'+temp+'?src_lang=ru';
                }
             else{
                 temp = ms[2]['EN'].replace('?', '&quest');
                 temp = temp.replace(' ', '%20');
 
-                ms[5]='https://translator1.loca.lt/synthesize/'+temp+'?src_lang=en';
+                ms[5]='https://translator2.loca.lt/synthesize/'+temp+'?src_lang=en';
             }
 
     const msgHTML = `
