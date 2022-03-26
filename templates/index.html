@@ -56,8 +56,8 @@
     </div>
     <div class="msger-header-options">
       <span><i class="fas fa-cog"></i></span>
-
       <button type="submit" onclick="window.location='/addToChat/new'" class="msger-send-btn">Add a friend +</button>
+      <button type="submit" id="button1" onclick="openNav()" class="msger-send-btn">Open Chatpanel</button>
     </div>
   </header>
 
@@ -109,6 +109,22 @@
 <!--
 <script src="{{ url_for('static', filename='map.js') }}"></script>
 --->
+
+
+<script>
+function openNav() {
+  document.getElementById("friend-list").style.width = "30%";
+  document.getElementById("friend-list").style.maxWidth = "300px";
+  document.getElementById("button1").onclick = closeNav;
+  document.getElementById("button1").innerHTML = "Close Chatpanel";
+}
+
+function closeNav() {
+  document.getElementById("friend-list").style.width = "0";
+  document.getElementById("button1").onclick = openNav;
+  document.getElementById("button1").innerHTML = "Open Chatpanel";
+}
+</script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script crossorigin="anonymous"
