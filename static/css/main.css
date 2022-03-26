@@ -27,7 +27,7 @@ body {
   display: flex;
   flex-flow: column wrap;
   justify-content: space-between;
-  width: 80%;
+  width: 65%;
   max-width: 867px;
   margin: 25px 10px;
   height: calc(90% - 50px);
@@ -79,7 +79,7 @@ body {
   border-radius: 50%;
 }
 .msg-bubble {
-  max-width: 450px;
+  max-width: min(70%,450px);
   padding: 15px;
   border-radius: 15px;
   background: var(--left-msg-bg);
