@@ -95,7 +95,7 @@ body {
   font-weight: bold;
 }
 .msg-info-time {
-  font-size: 0.85em;
+  font-size: min(2vw, 12px);
 }
 
 .left-msg .msg-bubble {
@@ -124,7 +124,7 @@ body {
   padding: 10px;
   border: none;
   border-radius: 3px;
-  font-size: 1em;
+  font-size: min(3vw, 18px);
 }
 .msger-input {
   flex: 1;

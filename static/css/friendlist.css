@@ -40,7 +40,7 @@ html, body {
 }
 
 .friend .name {
-  font-size: 18px;
+  font-size: min(3vw, 18px);
 }
 
 .friend.selected {
