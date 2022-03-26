@@ -8,12 +8,13 @@ html, body {
   list-style: none;
   height: 4px;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: hidden;
   display: block;
   margin: 0;
   padding: 0;
-  width: 300px;
-  height: 100%;
+  width: 20%;
+  max-width: 300px;
+  height: 80%;
   background: #EEE;
   list-style-type: none;
 }
@@ -53,4 +54,9 @@ html, body {
 
 .friend:not(.selected):hover {
   background: #DDD;
+}
+
+.friend-list:hover {
+  background: #DAA;
+  width: 300px;
 }

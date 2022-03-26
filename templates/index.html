@@ -3,7 +3,7 @@
 <head>
   <meta charset=UTF-8"/>
   <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=yes, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=egde">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/friendlist.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
@@ -12,45 +12,35 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-  <div class="container-fluid">
+
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
     <a class="navbar-brand" id="name_of_person">{{ name }}</a>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-      <ul class="navbar-nav me-auto mb-2 mb-md-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page">Account</a>
-        </li>
-        <li class="nav-item">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
           <a class="nav-link active" aria-current="page" href="/home">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login">Log out</a>
+          <a class="nav-link" href="/login">Log in</a>
         </li>
       </ul>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Type a name..." aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Find</button>
-      </form>
     </div>
-  </div>
 </nav>
 
 
 <ul id='friend-list' class="scroll">
-  <li class='friend'>
-    <img src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' />
-    <div class='name'>
-
-    </div>
-  </li>
-
   <li>
-    <button class="w-100 btn btn-lg btn-primary" onclick="window.location='/addToChat/new'" type="submit">Create a new dialog</button>
+    <button class="w-100 btn btn-lg btn-primary" onclick="window.location='/addToChat/new'" type="submit">New
+      dialog</button>
   </li>
 
   {% for ct in chats %}
     <li class='friend' onclick="window.location='/chat/{{ct.id}}'">
-      <img src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' />
+      <img src='https://cdn-icons-png.flaticon.com/512/724/724728.png' />
       <div class='name'>
         {{ct.chatname}}
       </div>

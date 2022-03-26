@@ -3,7 +3,7 @@
 <head>
   <meta charset=UTF-8"/>
   <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=yes, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=egde">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/friendlist.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
@@ -12,35 +12,26 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand">Welcome, {{ name }}</a>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-      <ul class="navbar-nav me-auto mb-2 mb-md-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page">Account</a>
-        </li>
-        <li class="nav-item">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" id="name_of_person">  {{ name + (' RU' if current_user.lang==1 else ' EN') }}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
           <a class="nav-link active" aria-current="page" href="/home">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login">Log out</a>
+          <a class="nav-link" href="/login">Log in</a>
         </li>
       </ul>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Type a name..." aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Find</button>
-      </form>
     </div>
-  </div>
 </nav>
 
 
-  <ul id='friend-list' class="scroll">
+  <ul id='friend-list' class="scroll" style="width:300px">
     <form method="post">
-    <li class='friend'>
-    </li>
-
     <li>
       <button class="w-100 btn btn-lg btn-primary" type="submit">Add friends to dialog</button>
     </li>
@@ -51,10 +42,14 @@
 
     {% for fr in friends %}
     <li class='friend'>
-      <img src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' />
+      {% if fr.lang==1 %}
+        <img src='https://cdn-icons.flaticon.com/png/512/4628/premium/4628645.png?token=exp=1648320369~hmac=4f423f4b48204ab4f72d529e51ea7f97' />
+      {% else %}
+        <img src='https://cdn-icons-png.flaticon.com/512/197/197484.png' />
+      {% endif %}
       <input type="checkbox" id={{ fr.id }} name={{ fr.id }}>
       <div class='name'>
-        {{fr.username}} {{'RU' if fr.lang==1 else 'EN'}} ({{fr.id}})
+        {{fr.username}} {{'🇷🇺' if fr.lang==1 else '🇺🇸'}}
       </div>
     </li>
     {% endfor %}

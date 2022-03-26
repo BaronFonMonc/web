@@ -133,7 +133,7 @@ function appendMessageFull(ms, side) {
 
         <div class="msg-bubble">
             <div class="msg-text">
-                <audio src=${ms[5]} controls>Audio tag not supported</audio>
+                <audio src=${ms[5]} controls autoplay>Audio tag not supported</audio>
             </div>
         </div>
       </div>
