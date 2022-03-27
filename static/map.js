@@ -89,13 +89,15 @@ msgerForm.addEventListener("submit", event => {
                                 }
                             }
                         }
-                        console.log('Received message');
+                        console.log('Received message', data);
+
                     }
                 });
 
 
 function appendMessageFull(ms, side) {
-                if (document.getElementById("name_of_person").innerHTML.split(' ')[1] == 'RU'){
+            console.log(PERSON_NAME, document.getElementById("name_of_person").innerHTML.split(' ')[1])
+            if (document.getElementById("name_of_person").innerHTML.split(' ')[1] == 'RU'){
                 temp = ms[2]['RU'].replace('?', '&quest');
                 temp = temp.replace(' ', '%20');
 
