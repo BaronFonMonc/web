@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey, delete, insert, update
 from flask_login import UserMixin
 from flask_login import LoginManager
-from flask_login import login_user, login_required, current_user
+from flask_login import login_user, login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
@@ -118,6 +118,7 @@ def handleMessage(data):
             msgs = [current_user.id, current_user.username,
                        {'EN': msgs[0], 'RU': msgs[1]}, now.strftime("%b %d, %Y, %X"),
                        'RU' if current_user.lang == 1 else 'EN']
+
             if current_user.lang == 1:
                 temp = msgs[2]['RU'].replace('?', '&quest')
                 temp = temp.replace(' ', '%20')
@@ -129,6 +130,16 @@ def handleMessage(data):
 
                 msgs.append(f'{path}synthesize/{temp}?src_lang=en')
 
+            msgs.append({'EN': 0, 'RU': 1})
+            temp = msgs[2]['RU'].replace('?', '&quest')
+            temp = temp.replace(' ', '%20')
+
+            msgs[6]['RU']=f'{path}synthesize/{temp}?src_lang=ru'
+
+            temp = msgs[2]['EN'].replace('?', '&quest')
+            temp = temp.replace(' ', '%20')
+
+            msgs[6]['EN']=f'{path}synthesize/{temp}?src_lang=en'
 
             data['msgs'] = msgs
             print(f"Message: {data} CurrentUser: {current_user.id}, {current_user.username}")
@@ -148,6 +159,7 @@ def handleMessage(data):
 
 @app.route('/login')
 def login():
+    logout_user();
     return render_template("login.html")
 
 
@@ -238,7 +250,8 @@ def index():
                                name=current_user.username + ' ' + ('EN' if current_user.lang == 0 else 'RU'), chats=chats)
         # return render_template("index.html", name=current_user.username)
     else:
-        return render_template("index.html", name="Stranger")
+        return redirect(url_for('login'))
+        #return render_template("index.html", name="Stranger")
 
 
 @login_required
@@ -398,7 +411,7 @@ def showFriends(chatId):
         return redirect(url_for('index'))
     return render_template('friends.html', name=current_user.username, friends=User.query.order_by(User.id).all(),
                            inThisChat=ans,
-                           user=current_user)
+                           user=current_user, chatID=chatId)
 
 
 @login_required
@@ -451,7 +464,7 @@ def addToChat(chatId):
             s = current_user.username
             for i in friends:
                 if i != 'name' and int(i) != current_user.id:
-                    s += User.query.filter_by(id=int(i)).first().username
+                    s += ", " + User.query.filter_by(id=int(i)).first().username
             friends['name'] = s
 
         print("Name of chat is: " + friends['name'])

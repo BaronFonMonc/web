@@ -96,18 +96,27 @@ msgerForm.addEventListener("submit", event => {
 
 
 function appendMessageFull(ms, side) {
-            console.log(PERSON_NAME, document.getElementById("name_of_person").innerHTML.split(' ')[1])
+            console.log("Ms: ",ms);
             if (document.getElementById("name_of_person").innerHTML.split(' ')[1] == 'RU'){
-                temp = ms[2]['RU'].replace('?', '&quest');
-                temp = temp.replace(' ', '%20');
+                if (ms[4] == 'EN'){
+                    ms[5]=ms[6]['RU']
+                    /*temp = ms[2]['RU'].replace('?', '&quest');
+                    temp = temp.replace(' ', '%20');
 
-                ms[5]='http://244f-185-32-134-80.ngrok.io/synthesize/'+temp+'?src_lang=ru';
+                    ms[5]='http://244f-185-32-134-80.ngrok.io/synthesize/'+temp+'?src_lang=ru';
+                    console.log('After: ', ms[5]);*/
+                }
                }
             else{
-                temp = ms[2]['EN'].replace('?', '&quest');
-                temp = temp.replace(' ', '%20');
+                if (ms[4] == 'RU'){
+                    ms[5]=ms[6]['EN']
+                    /*
+                    temp = ms[2]['EN'].replace('?', '&quest');
+                    temp = temp.replace(' ', '%20');
 
-                ms[5]='http://244f-185-32-134-80.ngrok.io/synthesize/'+temp+'?src_lang=en';
+                    ms[5]='http://244f-185-32-134-80.ngrok.io/synthesize/'+temp+'?src_lang=en';
+                    console.log('After: ', ms[5]);*/
+                }
             }
 
     const msgHTML = `

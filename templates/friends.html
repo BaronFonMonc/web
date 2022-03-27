@@ -34,7 +34,7 @@
         </form>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login">Log in</a>
+          <a class="nav-link" href="/login">Log out</a>
         </li>
       </ul>
     </div>
@@ -45,8 +45,10 @@
       style="width:300px;   position: static;  z-index: auto;  left: auto;  padding-top: auto;">
     <form method="post">
     <li>
+      {% if chatID != 'new' %}
       <button class="w-100 btn btn-lg btn-primary" name="LeaveButton" type="submit" style="background: #CD432B">Leave a
         dialog</button>
+      {% endif %}
     </li>
     <li>
       <button class="w-100 btn btn-lg btn-primary" type="submit">Add friends to dialog</button>
@@ -61,8 +63,8 @@
     </li>
 
     {% for fr in friends %}
-    {% if fr.username !='BOT' %}
-    <li class='friend'>
+    {% if fr.username not in ['BOT', user.username] %}
+    <li class='friend' style="cursor: auto">
       {% if fr.lang==1 %}
         <img src='https://cdn-icons-png.flaticon.com/512/197/197408.png' />
       {% else %}

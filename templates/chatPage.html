@@ -34,7 +34,7 @@
         </form>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login">Log in</a>
+          <a class="nav-link" href="/login">Log out</a>
         </li>
       </ul>
     </div>
@@ -67,10 +67,9 @@
     <div class="msger-header-options">
       <span><i class="fas fa-cog"></i></span>
       <button type="submit" onclick="window.location='/addToChat/{{chatId}}'" class="msger-send-btn"
-              style="font-size: min(2vw, 16px)">Add a friend
-        +</button>
+              style="font-size: min(2vw, 16px)">Edit dialog</button>
       <button type="submit" id="button1" onclick="openNav()" class="msger-send-btn"
-              style="font-size: min(2vw, 16px)">Open Chatpanel</button>
+              style="font-size: min(2vw, 16px)">Open Dialogpanel</button>
     </div>
   </header>
 
@@ -159,13 +158,13 @@ function openNav() {
   document.getElementById("friend-list").style.width = "30%";
   document.getElementById("friend-list").style.maxWidth = "300px";
   document.getElementById("button1").onclick = closeNav;
-  document.getElementById("button1").innerHTML = "Close Chatpanel";
+  document.getElementById("button1").innerHTML = "Close Dialogpanel";
 }
 
 function closeNav() {
   document.getElementById("friend-list").style.width = "0";
   document.getElementById("button1").onclick = openNav;
-  document.getElementById("button1").innerHTML = "Open Chatpanel";
+  document.getElementById("button1").innerHTML = "Open Dialogpanel";
 }
 </script>
 
