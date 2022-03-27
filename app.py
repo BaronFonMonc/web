@@ -1,7 +1,7 @@
 import requests as requests
 from flask import Flask, render_template, url_for, redirect, request, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, delete, insert, update
 from flask_login import UserMixin
 from flask_login import LoginManager
 from flask_login import login_user, login_required, current_user
@@ -210,14 +210,30 @@ def signup():
 
 
 @login_required
-@app.route('/')
-@app.route('/home')
+@app.route('/', methods=['GET'])
+@app.route('/home', methods=['GET'])
 def index():
     # print(session)
     if current_user.is_authenticated:
         chats = ChatToUser.query.filter_by(id_user=current_user.id).all()
         for i in range(len(chats)):
             chats[i] = Chat.query.filter_by(id=chats[i].id_chat).first()
+
+        if request.method == 'GET' and len(request.args.to_dict())>0:
+            print(request.args.to_dict())
+            if 'EnglishButton' in request.args.to_dict():
+                print('EN')
+                user = User.query.filter_by(id=current_user.id).first()
+                user.lang = 0
+                db.session.commit()
+            else:
+                user = User.query.filter_by(id=current_user.id).first()
+                user.lang = 1
+                db.session.commit()
+                print('RU')
+            return redirect(url_for('index'))
+
+
         return render_template("index.html",
                                name=current_user.username + ' ' + ('EN' if current_user.lang == 0 else 'RU'), chats=chats)
         # return render_template("index.html", name=current_user.username)
@@ -233,8 +249,24 @@ def about():
 
 
 @login_required
-@app.route('/chat/<id>')
+@app.route('/chat/<id>', methods=['GET'])
 def chat(id):
+    if request.method == 'GET' and len(request.args.to_dict()) > 0:
+        print(request.args.to_dict())
+        if 'EnglishButton' in request.args.to_dict():
+            print('EN')
+            user = User.query.filter_by(id=current_user.id).first()
+            user.lang = 0
+            db.session.commit()
+        else:
+            user = User.query.filter_by(id=current_user.id).first()
+            user.lang = 1
+            db.session.commit()
+            print('RU')
+        return redirect(url_for('chat', id=id))
+
+
+
     print(id)
     if current_user.is_authenticated:
         if ChatToUser.query.filter_by(id_user=current_user.id, id_chat=int(id)).first():
@@ -247,9 +279,13 @@ def chat(id):
         # TODO: Check if you have access to this chat
         # TODO: Check if this chat exist
 
+        chatName = 'SimpleChat'
+
         chats = ChatToUser.query.filter_by(id_user=current_user.id).all()
         for i in range(len(chats)):
             chats[i] = Chat.query.filter_by(id=chats[i].id_chat).first()
+            if (int(id) == int(chats[i].id)):
+                chatName = chats[i].chatname
 
         msgs = Messages.query.filter_by(id_chat=int(id)).all()
         for i in range(len(msgs)):
@@ -288,7 +324,7 @@ def chat(id):
             # print(msgs[i])
 
         return render_template("chatPage.html", name=current_user.username + ' ' + ('EN' if current_user.lang == 0 else 'RU'),
-                               chats=chats, chatId=id, msgs=msgs, my_link="{path}dummy_audio")
+                               chats=chats, chatId=id, chatName = chatName,msgs=msgs, my_link="{path}dummy_audio")
     else:
         return redirect(url_for("index"))
 
@@ -351,13 +387,22 @@ def account(id):
 
 @app.route('/addToChat/<chatId>')
 def showFriends(chatId):
+    ans = [current_user.id]
+    if chatId!='new':
+        ans = [i.id_user for i in ChatToUser.query.filter_by(id_chat=int(chatId)).order_by(ChatToUser.id).all()]
+        print(ans)
+        # TODO: ADMIN! [0]
+
+
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
-    return render_template('friends.html', name=current_user.username, friends=User.query.order_by(User.id).all(), user=current_user)
+    return render_template('friends.html', name=current_user.username, friends=User.query.order_by(User.id).all(),
+                           inThisChat=ans,
+                           user=current_user)
 
 
 @login_required
-@app.route('/addToChat/<chatId>', methods=['POST'])
+@app.route('/addToChat/<chatId>', methods=['POST', 'GET'])
 def addToChat(chatId):
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -376,10 +421,31 @@ def addToChat(chatId):
             return redirect(url_for("index"))
     # Проверяем есть ли чат с таким id (Если нет кикай отсюда)
     # Если есть: Проверяем может ли такой пользователь добавить (есть ли он в чате)
+    #if request.method == :
+    #    print(request.args.to_dict())
+    #    if 'EnglishButton' in request.args.to_dict():
+    #        print('EN')
+    #    else:
+    #        print('RU')
+    #    return redirect(url_for('index'))
+
 
     if request.method == 'POST':
         print(request.form.to_dict())
         friends = request.form.to_dict()
+
+        if 'LeaveButton' in friends:
+            temp = ChatToUser.query.filter_by(id_chat=chatId, id_user=current_user.id)
+            print(temp, 1 if temp else 0)
+            if temp:
+                temp.delete()
+                db.session.commit()
+            return redirect(url_for("index"))
+
+        if friends['name'] != '' and chatId!='new':
+            temp = Chat.query.filter_by(id=chatId).first()
+            temp.chatname = friends['name']
+            db.session.commit()
 
         if friends['name'] == '':
             s = current_user.username
@@ -396,14 +462,25 @@ def addToChat(chatId):
             db.session.commit()
             chatId = new_chat.id
 
+
         print(chatId)
+
+
+        previous_friends = [i.id_user for i in ChatToUser.query.filter_by(id_chat=int(chatId)).order_by(ChatToUser.id).all()]
+
+        for i in previous_friends:
+            if (int(i)!=current_user.id):
+                if str(i) not in friends:
+                    print(i, " was deleted") # TODO: BOT socket + db пишет что удалили
+                    ChatToUser.query.filter_by(id_chat=int(chatId), id_user=int(i)).delete();
+                    db.session.commit();
 
         for i in friends:
             if (i != 'name'):
                 if ChatToUser.query.filter_by(id_chat=chatId, id_user=int(i)).first():
                     print(i + " Already in this chat")
                 else:
-                    print(i + " Added")
+                    print(i + " Added") # TODO: BOT socket + db пишет что добавили
                     c_t_u = ChatToUser(id_chat=chatId, id_user=int(i))
                     db.session.add(c_t_u)
                     db.session.commit()
@@ -411,7 +488,7 @@ def addToChat(chatId):
                 if ChatToUser.query.filter_by(id_chat=chatId, id_user=current_user.id).first():
                     print(str(current_user.id) + " Already in this chat")
                 else:
-                    print(str(current_user.id) + " Added")
+                    print(str(current_user.id) + " Added") # TODO: BOT socket + db пишет что добавили
                     c_t_u = ChatToUser(id_chat=chatId, id_user=current_user.id)
                     db.session.add(c_t_u)
                     db.session.commit()

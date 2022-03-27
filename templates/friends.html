@@ -22,6 +22,17 @@
         <li class="nav-item active">
           <a class="nav-link active" aria-current="page" href="/home">Home</a>
         </li>
+        <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Language
+        </a>
+        <form action="" method="get">
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <button name="EnglishButton" class="dropdown-item">English 🇺🇸</button>
+            <button name="RussianButton" class="dropdown-item">Russian 🇷🇺</button>
+          </div>
+        </form>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="/login">Log in</a>
         </li>
@@ -34,29 +45,71 @@
       style="width:300px;   position: static;  z-index: auto;  left: auto;  padding-top: auto;">
     <form method="post">
     <li>
+      <button class="w-100 btn btn-lg btn-primary" name="LeaveButton" type="submit" style="background: #CD432B">Leave a
+        dialog</button>
+    </li>
+    <li>
       <button class="w-100 btn btn-lg btn-primary" type="submit">Add friends to dialog</button>
     </li>
     <li>
-      <input type="text" name="name" class="form-control" id="floatingName" size="32" maxlength="30" minlength="3" placeholder="Name of this dialog...">
+      <input type="text" name="name" class="form-control" id="floatingName" size="32" maxlength="30" minlength="3"
+             placeholder="New name of this dialog...">
+    </li>
+    <li>
+      <input type="text" name="name" id="myInput" onkeyup="myFunction()" class="form-control" size="32" maxlength="30" minlength="3"
+             placeholder="Find a friend...">
     </li>
 
-
     {% for fr in friends %}
+    {% if fr.username !='BOT' %}
     <li class='friend'>
       {% if fr.lang==1 %}
         <img src='https://cdn-icons-png.flaticon.com/512/197/197408.png' />
       {% else %}
         <img src='https://cdn-icons-png.flaticon.com/512/197/197484.png' />
       {% endif %}
-      <input type="checkbox" id={{ fr.id }} name={{ fr.id }}>
+      {% if fr.id in inThisChat %}
+        {% if current_user.id != inThisChat[0] %}
+
+        <input type="checkbox" id={{ fr.id }} name={{ fr.id }} checked disabled>
+        {% else %}
+        <input type="checkbox" id={{ fr.id }} name={{ fr.id }} checked>
+        {% endif %}
+      {% else %}
+        <input type="checkbox" id={{ fr.id }} name={{ fr.id }}>
+      {% endif %}
       <div class='name'>
         {{fr.username}} {{'🇷🇺' if fr.lang==1 else '🇺🇸'}}
       </div>
     </li>
+    {% endif %}
     {% endfor %}
 
     </form>
   </ul>
+
+<script>
+function myFunction() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("friend-list");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("div");
+        if (a.length>0){
+          a = a[0];
+          txtValue = a.innerHTML;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              li[i].style.display = "";
+          } else {
+              li[i].style.display = "none";
+          }
+        }
+
+    }
+}
+</script>
 
 
 </body>
