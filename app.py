@@ -10,7 +10,7 @@ from datetime import datetime
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 
 
-path = 'https://translator1.loca.lt/'
+path = 'http://244f-185-32-134-80.ngrok.io/' # 'https://translator1.loca.lt/'
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'

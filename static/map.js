@@ -54,6 +54,7 @@ msgerForm.addEventListener("submit", event => {
                 $('#send_msg').on('click', () => {
                     const msgText = msgerInput.value;
                     if (!msgText) return;
+                    console.log(msgerInput.value, username, window.location.href);
                     socket.send({
                             'msg': msgerInput.value,
                             'username': username,
@@ -94,17 +95,17 @@ msgerForm.addEventListener("submit", event => {
 
 
 function appendMessageFull(ms, side) {
-                if (PERSON_NAME.split(' ')[1] == 'RU'){
+                if (document.getElementById("name_of_person").innerHTML.split(' ')[1] == 'RU'){
                 temp = ms[2]['RU'].replace('?', '&quest');
                 temp = temp.replace(' ', '%20');
 
-                ms[5]='https://translator1.loca.lt/synthesize/'+temp+'?src_lang=ru';
+                ms[5]='http://244f-185-32-134-80.ngrok.io/synthesize/'+temp+'?src_lang=ru';
                }
             else{
                 temp = ms[2]['EN'].replace('?', '&quest');
                 temp = temp.replace(' ', '%20');
 
-                ms[5]='https://translator1.loca.lt/synthesize/'+temp+'?src_lang=en';
+                ms[5]='http://244f-185-32-134-80.ngrok.io/synthesize/'+temp+'?src_lang=en';
             }
 
     const msgHTML = `
